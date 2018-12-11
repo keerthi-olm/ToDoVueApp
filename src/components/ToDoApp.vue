@@ -4,10 +4,10 @@
     <li class="mainsmall">
       <input ref="newItem" placeholder="Add a new task..." />
     </li>
-    <li class="button add"><button v-on:click="add">Add</button></li>
-    <li class="button reset"><button onClick="{this.reset}">Reset</button></li>
+    <li class="button add"><button v-on:click="_handleAddItem">Add</button></li>
+    <li class="button reset"><button v-on:click="_handleResetList">Reset</button></li>
     <li class="main" v-for="(item, index) in list" :key="index">
-      <input
+      <input :key="index+100"
         v-if="
           doneList.filter(function(val) {
             return val === index;
@@ -19,22 +19,22 @@
         class="checkbox"
         type="checkbox"
         :id="index"
-        v-on:click="handleClick"
+        v-on:click="_handleUpdateDoneList"
       />
-      <input
+      <input :key="index+100"
         v-else
         class="checkbox"
         type="checkbox"
         :checked="true"
         :id="index"
-        v-on:click="handleClick"
+        v-on:click="_handleUpdateDoneList"
       />
 
       <strike>{{ item }}</strike>
     </li>
 
     <li class="footer">
-      <button class="remove" v-on:click="remove">Remove</button>
+      <button class="remove" v-on:click="_handleRemoveDoneItems">Remove</button>
     </li>
   </ul>
 </template>
@@ -45,32 +45,25 @@ export default {
   data() {
     return {
       list: ["Get up in the morning", "Brush my teeth"],
-      doneList: [1,0]
+      doneList: [0]
     };
   },
   computed: {
-    check(index) {
-      console.log("-------------->");
-      console.log(
-        this.doneList.filter(val => {
-          return val === index;
-        })
-      );
-      return (
-        this.doneList.filter(val => {
-          return false;
-        }) == undefined
-      );
-    }
+    // Computed stuff goes here
   },
   methods: {
-    add() {
+     init() {
+       this.resetList=[...this.list];
+       this.resetDoneList=[...this.doneList];
+     },
+    _handleAddItem() {
       var newItem = this.$refs.newItem;
       if (newItem.value === "") return;
       this.list.push(newItem.value);
       console.log(this.$refs.newItem.value);
+      newItem.value = ""
     },
-    handleClick(e) {
+    _handleUpdateDoneList(e) {
       console.log(e.target.checked);
       let checkIfInDoneList = this.doneList.filter(function(val) {
         return val === parseInt(e.target.id);
@@ -89,7 +82,7 @@ export default {
       console.log("donelist afterremove-->");
       console.log(this.doneList);
     },
-    remove(e) {
+    _handleRemoveDoneItems(e) {
       this.doneList.sort((a, b) => a - b);
       console.log(this.doneList);
       for (var i = this.doneList.length - 1; i >= 0; i--)
@@ -97,7 +90,24 @@ export default {
 
       console.log(this.list);
       this.doneList = [];
+    },
+     _handleResetList() {
+      //  let newItem =this.refs.newItem.value;
+      console.log("\n ***Reset Button Pressed... **");
+    
+
+      
+      this.donelist=[...this.resetDoneList];
+      this.list=[...this.resetList];
+        console.log(
+        "Reset handler will reset list to default values..." +
+          JSON.stringify(this.donelist)
+      );
     }
+
+  },
+  mounted(){
+    this.init()
   }
 };
 </script>
